@@ -65,6 +65,7 @@ def bookdetails(isbn):
 
     #dynamically create a web page for each book search result
     isbn = isbn.lower()
+    userid = session["userid"]
     if request.method == "POST":
         """"Get user review for a book."""
         # Get form information.
@@ -80,13 +81,13 @@ def bookdetails(isbn):
         elif rating=='option5':
             rating=5
         comment = request.form.get("comment")
-        userid = session["userid"]
 
         # Check if userid has previously submitted a review for this ISBN Number.
         if db.execute("SELECT * FROM reviews WHERE lower(isbn)=:isbn AND userid=:userid", {"isbn": isbn, "userid": userid}).rowcount > 0:
             flash("User has already submitted a review for this book.", "danger")
             book = db.execute("SELECT * FROM books WHERE lower(isbn)=:isbn", {"isbn":isbn}).fetchone()
-            return render_template("bookdetails.html",book=book,isbn=isbn)
+            reviewcount = db.execute("SELECT * FROM reviews WHERE lower(isbn)=:isbn", {"isbn": isbn}).rowcount
+            return render_template("bookdetails.html",book=book,isbn=isbn, reviewcount=reviewcount)
 
         db.execute("INSERT INTO reviews (rating, comment, isbn, userid) VALUES (:rating, :comment, :isbn, :userid)",
                 {"rating": rating, "comment": comment, "isbn": isbn, "userid": userid})
@@ -100,7 +101,8 @@ def bookdetails(isbn):
         return redirect(url_for('search'))
 
     book = db.execute("SELECT * FROM books WHERE lower(isbn)=:isbn", {"isbn":isbn}).fetchone()
-    return render_template("bookdetails.html",book=book,isbn=isbn)
+    reviewcount = db.execute("SELECT * FROM reviews WHERE lower(isbn)=:isbn", {"isbn": isbn}).rowcount
+    return render_template("bookdetails.html",book=book,isbn=isbn, reviewcount=reviewcount)
 
 @app.route("/login", methods=["POST"])
 def login():
