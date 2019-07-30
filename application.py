@@ -81,6 +81,13 @@ def bookdetails(isbn):
             rating=5
         comment = request.form.get("comment")
         userid = session["userid"]
+
+        # Check if userid has previously submitted a review for this ISBN Number.
+        if db.execute("SELECT * FROM reviews WHERE lower(isbn)=:isbn AND userid=:userid", {"isbn": isbn, "userid": userid}).rowcount > 0:
+            flash("User has already submitted a review for this book.", "danger")
+            book = db.execute("SELECT * FROM books WHERE lower(isbn)=:isbn", {"isbn":isbn}).fetchone()
+            return render_template("bookdetails.html",book=book,isbn=isbn)
+
         db.execute("INSERT INTO reviews (rating, comment, isbn, userid) VALUES (:rating, :comment, :isbn, :userid)",
                 {"rating": rating, "comment": comment, "isbn": isbn, "userid": userid})
         #db.execute("INSERT INTO reviews (rating, comment, isbn, userid) VALUES (5, 'best book', '380795272', 1)")
