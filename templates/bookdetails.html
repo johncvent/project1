@@ -1,0 +1,86 @@
+{% extends "layout.html" %}
+
+{% block navbar %}
+
+{% endblock %}
+
+{% block heading %}
+{% endblock %}
+
+{% block body %}
+
+  {% if session.log %}
+  <h1>Book Details</h1>
+
+    <ul>
+      <li>
+        Title: {{book[1]}}
+      </li>
+      <li>
+        Author: {{book[2]}}
+      </li>
+      <li>
+        Publication Year: {{book[3]}}
+      </li>
+      <li>
+        ISBN Number: {{book[0]}}
+      </li>
+      <li>
+        Number of Reviews: 0
+      </li>
+    </ul>
+
+<h2>Submit a Review</h2>
+
+    <form method="post">
+      <fieldset class="form-group">
+        <div class="row">
+          <legend class="col-form-label col-sm-1 pt-0">Rating (1-5, 5 being the best)</legend>
+          <div class="col-sm-10">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios1" value="option1" checked>
+              <label class="form-check-label" for="gridRadios1">
+                1
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios2" value="option2">
+              <label class="form-check-label" for="gridRadios2">
+                2
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios3" value="option3">
+              <label class="form-check-label" for="gridRadios3">
+                3
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios4" value="option4">
+              <label class="form-check-label" for="gridRadios4">
+                4
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios5" value="option5">
+              <label class="form-check-label" for="gridRadios5">
+                5
+              </label>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+      <div class="form-group">
+          <input class="form-control" name="comment" placeholder="Write a brief description to support your rating.">
+      </div>
+      <div class="form-group row">
+        <div class="col-sm-10">
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+      </div>
+    </form>
+
+  {% else %}
+    <h1>You  must login prior to performing searches.</h1>
+  {% endif %}
+{% endblock %}

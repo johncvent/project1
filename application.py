@@ -35,12 +35,74 @@ def register():
 
     # Check if email is already taken.
     if db.execute("SELECT * FROM users WHERE email = :email", {"email": email}).rowcount > 0:
-        return render_template("error.html", message="Email already registered.")
+        flash("Email already registered.", "danger")
+        return redirect(url_for('index'))
     db.execute("INSERT INTO users (name, password, email) VALUES (:name, :password, :email)",
             {"name": name, "password": password, "email": email})
     db.commit()
     flash("You are now registered.", "success")
     return redirect(url_for('index'))
+
+@app.route("/search", methods=["GET", "POST"])
+def search():
+    """"Search for books."""
+    if request.method == "GET":
+        return render_template("search.html")
+    else:
+        # Get form information.
+        keyword = request.form.get("keyword").lower()
+
+        # Check if keyword is part of ISBN Number.
+        if db.execute("SELECT * FROM books WHERE lower(isbn) like :keyword OR lower(title) like :keyword OR lower(author) like :keyword", {"keyword": "%"+keyword+"%"}).rowcount == 0:
+            flash("Book does not exist.", "danger")
+            return redirect(url_for('search'))
+
+        books = db.execute("SELECT * FROM books WHERE lower(isbn) like :keyword OR lower(title) like :keyword OR lower(author) like :keyword", {"keyword": "%"+keyword+"%"}).fetchall()
+        return render_template("search.html",books=books)
+
+@app.route("/<string:isbn>", methods=["GET", "POST"])
+def bookdetails(isbn):
+
+    #dynamically create a web page for each book search result
+    isbn = isbn.lower()
+    if request.method == "POST":
+        """"Get user review for a book."""
+        # Get form information.
+        rating = request.form.get("gridRadios")
+        if rating=='option1':
+            rating=1
+        elif rating=='option2':
+            rating=2
+        elif rating=='option3':
+            rating=3
+        elif rating=='option4':
+            rating=4
+        elif rating=='option5':
+            rating=5
+        comment = request.form.get("comment")
+        userid = session["userid"]
+        db.execute("INSERT INTO reviews (rating, comment, isbn, userid) VALUES (:rating, :comment, :isbn, :userid)",
+                {"rating": rating, "comment": comment, "isbn": isbn, "userid": userid})
+        #db.execute("INSERT INTO reviews (rating, comment, isbn, userid) VALUES (5, 'best book', '380795272', 1)")
+        db.commit()
+        flash("You submitted a review.", "success")
+
+    if db.execute("SELECT * FROM books WHERE lower(isbn)=:isbn", {"isbn":isbn}).rowcount == 0:
+        #return "The following ISBN does not exist: {}".format(isbn)
+        flash("The #following ISBN does not exist: {}".format(isbn), "danger")
+        return redirect(url_for('search'))
+
+    book = db.execute("SELECT * FROM books WHERE lower(isbn)=:isbn", {"isbn":isbn}).fetchone()
+    return render_template("bookdetails.html",book=book,isbn=isbn)
+
+#@app.route("/review", methods=["POST"])
+#def review(isbn):
+#    """"Get user review for a book."""
+#    # Get form information.
+#    rating = request.form.get("gridRadios")
+#    comment = request.form.get("inputcomment3")
+#    flash("You submitted a review.", "success")
+#    return redirect(url_for('bookdetails'))
 
 @app.route("/login", methods=["POST"])
 def login():
@@ -62,8 +124,10 @@ def login():
     flash("You are now logged in.", "success")
     session["log"] = True
     session["user"] = username
-
-    return redirect(url_for('index'))
+    sessionuser = session["user"]
+    userid= db.execute("SELECT userid FROM users WHERE email=:sessionuser", {"sessionuser": sessionuser}).fetchone()
+    session["userid"]=userid[0]
+    return redirect(url_for('search'))
 
 @app.route("/logout")
 def logout():

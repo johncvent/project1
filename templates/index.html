@@ -8,8 +8,9 @@
 
 {% block body %}
   {% if session.log %}
+  <h1>Welcome to Book Reviews Plus {{session["user"]}}!</h1>
   {% else %}
-  <h1>Welcome to Book Reviews Plus!</h1>
+  <h1>Welcome to Book Reviews Plus! New? Register here!</h1>
 
 <form action="{{ url_for('register') }}" method="post">
 
@@ -31,4 +32,5 @@
 
 </form>
     {% endif %}
+This is the userid for the session:{{session["userid"]}}
 {% endblock %}
