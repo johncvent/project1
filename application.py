@@ -102,15 +102,6 @@ def bookdetails(isbn):
     book = db.execute("SELECT * FROM books WHERE lower(isbn)=:isbn", {"isbn":isbn}).fetchone()
     return render_template("bookdetails.html",book=book,isbn=isbn)
 
-#@app.route("/review", methods=["POST"])
-#def review(isbn):
-#    """"Get user review for a book."""
-#    # Get form information.
-#    rating = request.form.get("gridRadios")
-#    comment = request.form.get("inputcomment3")
-#    flash("You submitted a review.", "success")
-#    return redirect(url_for('bookdetails'))
-
 @app.route("/login", methods=["POST"])
 def login():
     """"Login to the site."""
