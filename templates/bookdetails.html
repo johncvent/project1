@@ -80,6 +80,17 @@
       </div>
     </form>
 
+    <h2>Reviews to Date</h2>
+
+    <ul>
+    {%for review in reviews%}
+      <li>
+        <{{review}}
+      </li>
+    {%endfor%}
+    </ul>
+
+
   {% else %}
     <h1>You  must login prior to performing searches.</h1>
   {% endif %}

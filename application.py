@@ -87,22 +87,22 @@ def bookdetails(isbn):
             flash("User has already submitted a review for this book.", "danger")
             book = db.execute("SELECT * FROM books WHERE lower(isbn)=:isbn", {"isbn":isbn}).fetchone()
             reviewcount = db.execute("SELECT * FROM reviews WHERE lower(isbn)=:isbn", {"isbn": isbn}).rowcount
-            return render_template("bookdetails.html",book=book,isbn=isbn, reviewcount=reviewcount)
+            reviews = db.execute("SELECT * FROM reviews WHERE lower(isbn)=:isbn", {"isbn":isbn}).fetchall()
+            return render_template("bookdetails.html",book=book,isbn=isbn, reviewcount=reviewcount, reviews=reviews)
 
         db.execute("INSERT INTO reviews (rating, comment, isbn, userid) VALUES (:rating, :comment, :isbn, :userid)",
                 {"rating": rating, "comment": comment, "isbn": isbn, "userid": userid})
-        #db.execute("INSERT INTO reviews (rating, comment, isbn, userid) VALUES (5, 'best book', '380795272', 1)")
         db.commit()
         flash("You submitted a review.", "success")
 
     if db.execute("SELECT * FROM books WHERE lower(isbn)=:isbn", {"isbn":isbn}).rowcount == 0:
-        #return "The following ISBN does not exist: {}".format(isbn)
         flash("The #following ISBN does not exist: {}".format(isbn), "danger")
         return redirect(url_for('search'))
 
     book = db.execute("SELECT * FROM books WHERE lower(isbn)=:isbn", {"isbn":isbn}).fetchone()
     reviewcount = db.execute("SELECT * FROM reviews WHERE lower(isbn)=:isbn", {"isbn": isbn}).rowcount
-    return render_template("bookdetails.html",book=book,isbn=isbn, reviewcount=reviewcount)
+    reviews = db.execute("SELECT * FROM reviews WHERE lower(isbn)=:isbn", {"isbn":isbn}).fetchall()
+    return render_template("bookdetails.html",book=book,isbn=isbn, reviewcount=reviewcount, reviews=reviews)
 
 @app.route("/login", methods=["POST"])
 def login():
