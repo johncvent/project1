@@ -1,4 +1,4 @@
-import os
+import os, requests
 
 from flask import Flask, session, render_template, request, url_for, redirect, flash
 from flask_session import Session
@@ -108,7 +108,10 @@ def bookdetails(isbn):
     book = db.execute("SELECT * FROM books WHERE lower(isbn)=:isbn", {"isbn":isbn}).fetchone()
     reviewcount = db.execute("SELECT * FROM reviews WHERE lower(isbn)=:isbn", {"isbn": isbn}).rowcount
     reviews = db.execute("SELECT * FROM reviews WHERE lower(isbn)=:isbn", {"isbn":isbn}).fetchall()
-    return render_template("bookdetails.html",book=book,isbn=isbn, reviewcount=reviewcount, reviews=reviews)
+    goodreads = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": "Y4om1fVsiZCJsTVwVhJx3w", "isbns": "9781632168146"}).json()
+
+    #rating = goodreads["books"]
+    return render_template("bookdetails.html",book=book,isbn=isbn, reviewcount=reviewcount, reviews=reviews, goodreads=goodreads)
 
 @app.route("/login", methods=["POST"])
 def login():

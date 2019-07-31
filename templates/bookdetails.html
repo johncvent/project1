@@ -10,7 +10,7 @@
 {% block body %}
 
   {% if session.log %}
-  <h1>Book Details</h1>
+  <h2>Book Details</h2>
 
     <ul>
       <li>
@@ -90,7 +90,11 @@
     {%endfor%}
     </ul>
 
-
+    <h2>Goodreads Review Statistics</h2>
+    <p>
+      The average user rating for this book on Goodreads.com is: {{goodreads["books"][0]["average_rating"]}} <br />
+      The total number of reviews for this book on Goodreads.com is: {{goodreads["books"][0]["reviews_count"]}} <br />
+    </p>
   {% else %}
     <h1>You  must login prior to performing searches.</h1>
   {% endif %}
