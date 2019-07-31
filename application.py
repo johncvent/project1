@@ -22,6 +22,9 @@ db = scoped_session(sessionmaker(bind=engine))
 
 @app.route("/")
 def index():
+#    if session["log"] == None:
+#        session["user"] = None
+#        session["userid"]= None
     return render_template("index.html")
 
 @app.route("/register", methods=["POST"])
@@ -65,7 +68,10 @@ def bookdetails(isbn):
 
     #dynamically create a web page for each book search result
     isbn = isbn.lower()
-    userid = session["userid"]
+    if "userid" in session:
+        userid = session["userid"]
+    else:
+        userid = None
     if request.method == "POST":
         """"Get user review for a book."""
         # Get form information.
@@ -132,6 +138,8 @@ def login():
 @app.route("/logout")
 def logout():
     session.pop('user',None)
-    session.clear()
+    session.pop('userid',None)
+    session.pop('log',False)
+    #session.clear()
     flash("You are now logged out.", "success")
     return redirect(url_for('index'))
